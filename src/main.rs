@@ -1,17 +1,20 @@
 
-#![feature(io)]
+extern crate bufstream;
 
-use std::io::{Result, Read, BufRead, BufReader, Write, BufWriter, BufStream};
+use std::error::{Error};
+use std::io;
+use std::io::{BufRead, Write};
 use std::net::{TcpStream};
+use bufstream::BufStream;
 
-fn io() -> Result<()> {
-    let mut raw_stream = try!(TcpStream::connect("irc.freenode.net:6667"));
+fn io() -> io::Result<()> {
+    let raw_stream = try!(TcpStream::connect("irc.freenode.net:6667"));
     let mut stream = BufStream::new(raw_stream);
 
-    stream.write("NICK rircs\r\n".as_bytes());
-    stream.write("USER rircs localhost localhost :tutorial bot\r\n".as_bytes());
-    stream.write("JOIN #tutbot-testing\r\n".as_bytes());
-    stream.flush();
+    try!(stream.write("NICK rircs\r\n".as_bytes()));
+    try!(stream.write("USER rircs localhost localhost :tutorial bot\r\n".as_bytes()));
+    try!(stream.write("JOIN #tutbot-testing\r\n".as_bytes()));
+    try!(stream.flush());
 
     let mut line = String::new();
     loop {
